@@ -1,12 +1,15 @@
 {% extends "shared/base.html" %}
 
 
-{% block title %} 
+{% block title %}
   <title>MainPage Test</title>
 {% endblock %} 
 
 {% block content %} 
   <div class="container">
-    <h1 class="display-4">{{content.barriers_list}}</h1>
+      <p id = "pid">dfs</p>
+   {% for barrier in content.barriers_list %}
+             <p> {{ barrier }} </p>
+        {% endfor %}
   </div>
 {% endblock %} 
