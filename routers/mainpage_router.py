@@ -4,6 +4,7 @@ from sqlalchemy import select
 from models import basicModels
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
+from models.basicModels import *
 
 templates = Jinja2Templates(directory="templates")
 SQLALCHEMY_DATABASE_URL = (
@@ -29,48 +30,35 @@ async def get_barrier(barrier_id: int):
     query = (
         select(
             [
-                basicModels.barriers_table.c.id,
-                basicModels.barriers_table.c.number,
-                basicModels.barriers_table.c.description
+                barriers_table.c.id,
+                barriers_table.c.number,
+                barriers_table.c.camera_url,
+                barriers_table.c.camdirect_url,
+                barriers_table.c.description,
+                objects_table.c.name_and_address,
+                objects_table.c.is_free_departure_prohibited,
+                objects_table.c.is_free_jkh_passage_prohibited,
+                objects_table.c.is_free_delivery_passage_prohibited,
+                objects_table.c.is_free_collection_passage_prohibited,
+                objects_table.c.is_free_garbtrucks_passage_prohibited,
+                objects_table.c.is_free_post_passage_prohibited,
+                objects_table.c.is_free_taxi_passage_prohibited
+
             ]
-        ).where(basicModels.barriers_table.c.id == barrier_id)
+        ).where(barriers_table.c.id == barrier_id and objects_barriers_links_table.c.barrier_id == barriers_table.c.id
+                and objects_barriers_links_table.c.object_id == objects_table.c.id)
     )
     res = await database.database.fetch_all(query)
     fetched_barriers = list()
     for row in res:
-        fetched_barriers.append([row[0], row[1], row[2]])
+        fetched_barriers.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
+                                 row[10], row[11], row[12]])
     return fetched_barriers[0]
-
-
-async def get_all_barriers():
-    query = (
-        select(
-            [
-                basicModels.barriers_table.c.id,
-                basicModels.barriers_table.c.number,
-                basicModels.barriers_table.c.description
-            ]
-        )
-    )
-    res = await database.database.fetch_all(query)
-    fetched_barriers = list()
-    for row in res:
-        fetched_barriers.append([row[0], row[1], row[2]])
-    return fetched_barriers
 
 
 @app.get("/")
 async def read_root(request: Request):
-    content = dict()
-    content['barriers_list'] = await get_all_barriers()
-    return templates.TemplateResponse("pages/mainpage.html", {"request": request, "content": content})
-
-
-@app.get("/main")
-async def add_page_to_dashboard(request: Request):
-    content = dict()
-    content['barriers_list'] = await get_all_barriers()
-    return templates.TemplateResponse("pages/dynamic_data.html", {"request": request, "content": content})
+    return templates.TemplateResponse("pages/mainpage.html", {"request": request})
 
 
 # пока по id, потом по номеру
@@ -82,8 +70,18 @@ async def add_barrier_to_list(barrier_id: int):
             barriers.remove(filtred[0])
     else:
         barrier = await get_barrier(barrier_id)
-        barriers.append({"id": barrier[0], "number": barrier[1], "description": barrier[2]})
-    return {"id": barrier[0], "number": barrier[1], "description": barrier[2]}
+        camera_url = ''
+        if barrier[2] is None:
+            camera_url = barrier[3]
+        else:
+            camera_url = barrier[2]
+        barier_in_json = {"id": barrier[0], "number": barrier[1], "camera_url": barrier[2], "camdirect_url": barrier[3], "description": barrier[4],
+                          "object_name_and_address": barrier[5], "is_free_departure_prohibited": barrier[6], "is_free_jkh_passage_prohibited": barrier[7]
+                          , "is_free_delivery_passage_prohibited": barrier[8], "is_free_collection_passage_prohibited": barrier[9]
+                          , "is_free_garbtrucks_passage_prohibited": barrier[10], "is_free_post_passage_prohibited": barrier[11]
+                          , "is_free_taxi_passage_prohibited": barrier[12]}
+        barriers.append(barier_in_json)
+    return barier_in_json
 
 
 @app.get("/incoming_calls")

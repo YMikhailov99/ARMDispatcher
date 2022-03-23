@@ -1,52 +1,17 @@
 <html>
 <head>
+	<link rel="stylesheet" href="static/css/styles.css" type="text/css">
 	<meta http-equiv="Content-Type" content="text/html; Charset=UTF-8">
-	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="static/js/jquery.js"></script>
 </head>
 
 <body>
 
 	<div id="content"></div>
-	<ul id="list">
+	<ul id="list" class="hr">
+
 	</ul>
-	<script>
-		function show()
-		{
-			$.ajax({
-				url: "http://127.0.0.1:8000/incoming_calls",
-				cache: false,
-				success: function(json){
-					let data = JSON.parse(json);
-					var ul = document.getElementById("list");
-					var ul_children = ul.children;
-					for(var i = 0; i<ul_children.length; i++) {
-						var a = ul_children[i].getAttribute('id').slice(7);
-						if(!data.find(d=>d.id == a)){
-							ul.removeChild(ul_children[i])
-							i--;
-						}
-					}
-					for(var i = 0; i<data.length; i++){
-						var id = "element"+data[i].id;
-						if(document.getElementById(id) == null)
-						{
-							var li = document.createElement("li");
-							li.appendChild(document.createTextNode(data[i].description));
-							li.setAttribute("id", id);
-							ul.appendChild(li);
-
-						}
-
-					}
-				}
-			});
-		}
-
-		$(document).ready(function(){
-			show();
-			setInterval('show()',1000);
-		});
-	</script>
+	<script  type="text/javascript" src="static/js/refresh_data.js"></script>
 
 </body>
 </html>
