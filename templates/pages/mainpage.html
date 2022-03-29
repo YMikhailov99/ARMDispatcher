@@ -1,15 +1,17 @@
-{% extends "shared/base.html" %}
+<html>
+<head>
+	<link rel="stylesheet" href="{{url_for('static', path = 'css/styles.css')}}" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; Charset=UTF-8">
+	<script type="text/javascript" src="{{url_for('static', path = 'js/jquery.js')}}"></script>
+</head>
 
+<body>
 
-{% block title %}
-  <title>MainPage Test</title>
-{% endblock %} 
+	<div id="content"></div>
+	<ul id="list">
 
-{% block content %} 
-  <div class="container">
-      <p id = "pid">dfs</p>
-   {% for barrier in content.barriers_list %}
-             <p> {{ barrier }} </p>
-        {% endfor %}
-  </div>
-{% endblock %} 
+	</ul>
+	<script  type="text/javascript" src="{{url_for('static', path = 'js/refresh_data.js')}}"></script>
+
+</body>
+</html>

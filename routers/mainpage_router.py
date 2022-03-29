@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from models import database
 from sqlalchemy import select
-from models import basicModels
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from models.basicModels import *
@@ -70,16 +69,15 @@ async def add_barrier_to_list(barrier_id: int):
             barriers.remove(filtred[0])
     else:
         barrier = await get_barrier(barrier_id)
-        camera_url = ''
-        if barrier[2] is None:
-            camera_url = barrier[3]
-        else:
-            camera_url = barrier[2]
-        barier_in_json = {"id": barrier[0], "number": barrier[1], "camera_url": barrier[2], "camdirect_url": barrier[3], "description": barrier[4],
-                          "object_name_and_address": barrier[5], "is_free_departure_prohibited": barrier[6], "is_free_jkh_passage_prohibited": barrier[7]
-                          , "is_free_delivery_passage_prohibited": barrier[8], "is_free_collection_passage_prohibited": barrier[9]
-                          , "is_free_garbtrucks_passage_prohibited": barrier[10], "is_free_post_passage_prohibited": barrier[11]
-                          , "is_free_taxi_passage_prohibited": barrier[12]}
+        barier_in_json = {"id": barrier[0], "number": barrier[1], "camera_url": barrier[2], "camdirect_url": barrier[3],
+                          "description": barrier[4],
+                          "object_name_and_address": barrier[5], "is_free_departure_prohibited": barrier[6],
+                          "is_free_jkh_passage_prohibited": barrier[7],
+                          "is_free_delivery_passage_prohibited": barrier[8],
+                          "is_free_collection_passage_prohibited": barrier[9],
+                          "is_free_garbtrucks_passage_prohibited": barrier[10],
+                          "is_free_post_passage_prohibited": barrier[11],
+                          "is_free_taxi_passage_prohibited": barrier[12]}
         barriers.append(barier_in_json)
     return barier_in_json
 
@@ -87,3 +85,24 @@ async def add_barrier_to_list(barrier_id: int):
 @app.get("/incoming_calls")
 async def get_current_incoming_calls(request: Request):
     return barriers
+
+
+@app.get("/open_barrier_by_core")
+async def open_barrier_by_core(button_name, barrier_id):
+    return await send_request_to_core(None)
+
+
+async def send_request_to_core(request):
+    response = False
+    return response
+
+
+@app.get("/open_manually")
+async def open_manually(button_name, barrier_id):
+    return True
+
+
+@app.get("/close_manually")
+async def close_manually(button_name, barrier_id):
+    await add_barrier_to_list(int(barrier_id))
+    return True

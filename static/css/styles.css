@@ -5,8 +5,18 @@ body {
 	border-top: 5px solid #7e7e7e;
 	margin: 0;
 }
-
-button {
+.emergency {
+	color: #f00;
+	background-color: #f00;
+	border: none;
+	height: 99px;
+	min-width: 90px;
+	font-family: 'Oswald', sans-serif;
+	margin-right: 10px;
+	margin-bottom: 5px;
+	padding: 2px;
+}
+.team-row button {
 	color: #fff;
 	background-color: #29c5e6;
 	border: none;
@@ -17,6 +27,7 @@ button {
 	margin-bottom: 5px;
 	padding: 2px;
 }
+
 p {
 	margin: 20px 0;
 }
@@ -33,5 +44,5 @@ p {
 }
 
 li {
-    list-style-type: none;
+
    }
