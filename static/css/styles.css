@@ -31,7 +31,16 @@ body {
 p {
 	margin: 20px 0;
 }
+.team-row frame {
+	display: flex;
+	height: 250px;
+	width: 250px;
+	border: 1px solid #fff;
+	outline: 1px solid #c9c9c9;
+	margin-right: 10px;
+	display: inline;
 
+}
 .team-row img {
 	display: flex;
 	height: 250px;

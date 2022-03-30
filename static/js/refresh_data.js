@@ -26,7 +26,7 @@ function show()
 							div.appendChild(vp);
 
 							var address = document.createElement("p");
-							address.textContent ="Адрес: " + data[i].object_name_and_address;
+							address.textContent ="Адрес: " + data[i].name_and_address;
 							div.appendChild(address);
 
 							var reglament = document.createElement("p");

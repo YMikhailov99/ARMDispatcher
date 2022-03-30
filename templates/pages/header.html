@@ -1,0 +1,9 @@
+<nav >
+    <div class="justify-content-end">
+        <a href="/dashboard">Dashboard</a>&nbsp;
+        {% if content.user.role == "admin" %}
+            <a href="/users">Пользователи</a>&nbsp;
+        {% endif %}
+        <a href="/">Logout</a>&nbsp;
+    </div>
+</nav>

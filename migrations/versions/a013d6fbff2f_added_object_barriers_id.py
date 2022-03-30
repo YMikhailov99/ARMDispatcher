@@ -1,8 +1,8 @@
-"""Added required tables
+"""Added object_barriers_id
 
-Revision ID: a9bb797ccf4b
-Revises: 6cbf6e5a052e
-Create Date: 2022-03-14 23:11:45.667964
+Revision ID: a013d6fbff2f
+Revises: 
+Create Date: 2022-03-29 14:46:12.192570
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a9bb797ccf4b'
-down_revision = '6cbf6e5a052e'
+revision = 'a013d6fbff2f'
+down_revision = None
 branch_labels = None
 depends_on = None
 

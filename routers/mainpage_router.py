@@ -1,17 +1,44 @@
-from fastapi import FastAPI
-from models import database
-from sqlalchemy import select
-from fastapi import Request
 from fastapi.templating import Jinja2Templates
-from models.basicModels import *
+from fastapi_login import LoginManager
+from env import secret
+from fastapi.responses import HTMLResponse, RedirectResponse, ORJSONResponse
+from datetime import timedelta
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import FastAPI, HTTPException, Request, Depends, status, Form
+from hashlib import sha256
+from fastapi_login.exceptions import InvalidCredentialsException
+from CRUD.queries import *
 
 templates = Jinja2Templates(directory="templates")
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{database.DB_USER}:{database.DB_PASSWORD}@{database.DB_HOST}:5432/{database.DB_NAME}"
 )
 
-app = FastAPI()
+
+async def to_login(request, exc):
+    return templates.TemplateResponse("pages/login.html", {"request": request, })
+
+
+exceptions = {
+    404: to_login,
+    401: to_login,
+}
+
+app = FastAPI(exception_handlers=exceptions)
+manager = LoginManager(secret, token_url='/auth/token', use_cookie=True, default_expiry=timedelta(hours=12))
+manager.cookie_name = 'ARMDispatcher'
 barriers = list()
+
+
+@manager.user_loader()
+async def load_user(username: str):
+    query = (
+        select(
+            User
+        ).where(User.login == username)
+    )
+    user = await database.database.fetch_one(query)
+    return user
 
 
 @app.on_event("startup")
@@ -24,40 +51,15 @@ async def shutdown():
     await database.database.disconnect()
 
 
-# пока по id, потом по номеру
-async def get_barrier(barrier_id: int):
-    query = (
-        select(
-            [
-                barriers_table.c.id,
-                barriers_table.c.number,
-                barriers_table.c.camera_url,
-                barriers_table.c.camdirect_url,
-                barriers_table.c.description,
-                objects_table.c.name_and_address,
-                objects_table.c.is_free_departure_prohibited,
-                objects_table.c.is_free_jkh_passage_prohibited,
-                objects_table.c.is_free_delivery_passage_prohibited,
-                objects_table.c.is_free_collection_passage_prohibited,
-                objects_table.c.is_free_garbtrucks_passage_prohibited,
-                objects_table.c.is_free_post_passage_prohibited,
-                objects_table.c.is_free_taxi_passage_prohibited
+@app.get("/dashboard", response_class=HTMLResponse, summary="Dashboard")
+async def get_dashboard(request: Request, user=Depends(manager)):
+    if user:
+        content = dict()
+        content["user"] = user
 
-            ]
-        ).where(barriers_table.c.id == barrier_id and objects_barriers_links_table.c.barrier_id == barriers_table.c.id
-                and objects_barriers_links_table.c.object_id == objects_table.c.id)
-    )
-    res = await database.database.fetch_all(query)
-    fetched_barriers = list()
-    for row in res:
-        fetched_barriers.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
-                                 row[10], row[11], row[12]])
-    return fetched_barriers[0]
-
-
-@app.get("/")
-async def read_root(request: Request):
-    return templates.TemplateResponse("pages/mainpage.html", {"request": request})
+        return templates.TemplateResponse("pages/mainpage.html", {"request": request, "content": content})
+    else:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
 
 # пока по id, потом по номеру
@@ -69,21 +71,12 @@ async def add_barrier_to_list(barrier_id: int):
             barriers.remove(filtred[0])
     else:
         barrier = await get_barrier(barrier_id)
-        barier_in_json = {"id": barrier[0], "number": barrier[1], "camera_url": barrier[2], "camdirect_url": barrier[3],
-                          "description": barrier[4],
-                          "object_name_and_address": barrier[5], "is_free_departure_prohibited": barrier[6],
-                          "is_free_jkh_passage_prohibited": barrier[7],
-                          "is_free_delivery_passage_prohibited": barrier[8],
-                          "is_free_collection_passage_prohibited": barrier[9],
-                          "is_free_garbtrucks_passage_prohibited": barrier[10],
-                          "is_free_post_passage_prohibited": barrier[11],
-                          "is_free_taxi_passage_prohibited": barrier[12]}
-        barriers.append(barier_in_json)
-    return barier_in_json
+        barriers.append(barrier)
+    return barrier
 
 
 @app.get("/incoming_calls")
-async def get_current_incoming_calls(request: Request):
+async def get_current_incoming_calls(request: Request, user=Depends(manager)):
     return barriers
 
 
@@ -106,3 +99,92 @@ async def open_manually(button_name, barrier_id):
 async def close_manually(button_name, barrier_id):
     await add_barrier_to_list(int(barrier_id))
     return True
+
+
+@app.post('/auth/login', tags=['Users'])
+async def login(data: OAuth2PasswordRequestForm = Depends()):
+    username = data.username
+    password = sha256(data.password.encode('utf-8')).hexdigest()
+    user = await load_user(username)
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    elif password != user.password_sha256:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    access_token = manager.create_access_token(
+        data=dict(sub=username)
+    )
+    resp = RedirectResponse(url="/dashboard", status_code=status.HTTP_302_FOUND)
+    manager.set_cookie(resp, access_token)
+    return resp
+
+
+@app.post('/auth/token', tags=['Users'])
+async def token(data: OAuth2PasswordRequestForm = Depends()):
+    username = data.username
+    password = sha256(data.password.encode('utf-8')).hexdigest()
+    user = await load_user(username)  # we are using the same function to retrieve the user
+    if not user:
+        raise InvalidCredentialsException  # you can also use your own HTTPException
+    elif password != user.password_sha256:
+        raise InvalidCredentialsException
+
+    access_token = manager.create_access_token(
+        data=dict(sub=username)
+    )
+    return access_token
+
+
+@app.get("/", response_class=HTMLResponse, summary="Login page")
+async def login(request: Request):
+    return templates.TemplateResponse("pages/login.html", {"request": request, })
+
+
+@app.get("/users", response_class=HTMLResponse, summary="Users page", tags=['Users'])
+async def get_users(request: Request, user=Depends(manager)):
+    if user.role == "admin":
+        content = dict()
+        content["users"] = await get_all_users()
+        content["user"] = user
+        return templates.TemplateResponse("pages/userspage.html", {"request": request, "content": content})
+    else:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
+
+@app.post('/add_user', tags=['Users'])
+async def add_user(username: str = Form(...), role: str = Form(...), password: str = Form(...), user=Depends(manager)):
+    if user:
+        try:
+            await insert_user(username, role, sha256(password.encode('utf-8')).hexdigest())
+            return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)
+        except Exception:
+            return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)
+    else:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
+
+@app.post('/edit_user', tags=['Users'])
+async def edit_user(user_id: int = Form(...), user_login: str = Form(...), user_role: str = Form(...),
+                    user_password: str = Form(...), user=Depends(manager)):
+    if user:
+        try:
+            if len(user_password) < 5:
+                return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)
+            else:
+                await update_user(user_id, user_login, user_role, sha256(user_password.encode('utf-8')).hexdigest())
+                return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)
+        except Exception:
+            return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)
+    else:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
+
+@app.post('/remove_user', tags=['Users'])
+async def add_user(user_login: str = Form(...), user=Depends(manager)):
+    if user:
+        try:
+            await delete_user(user_login)
+            return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)
+        except Exception:
+            return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)
+    else:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)

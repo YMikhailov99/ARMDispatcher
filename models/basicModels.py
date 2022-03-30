@@ -1,42 +1,54 @@
-import sqlalchemy
+from sqlalchemy import create_engine, MetaData, Table, Integer, String, \
+    Column, ForeignKey,  Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
-metadata = sqlalchemy.MetaData()
-
-
-objects_table = sqlalchemy.Table(
-    "objects",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("name_and_address", sqlalchemy.String(100), unique=True, index=True),
-    sqlalchemy.Column("number", sqlalchemy.Integer()),
-    sqlalchemy.Column("description", sqlalchemy.String()),
-    sqlalchemy.Column("is_free_departure_prohibited", sqlalchemy.Boolean()),
-    sqlalchemy.Column("is_free_jkh_passage_prohibited", sqlalchemy.Boolean()),
-    sqlalchemy.Column("is_free_delivery_passage_prohibited", sqlalchemy.Boolean()),
-    sqlalchemy.Column("is_free_collection_passage_prohibited", sqlalchemy.Boolean()),
-    sqlalchemy.Column("is_free_garbtrucks_passage_prohibited", sqlalchemy.Boolean()),
-    sqlalchemy.Column("is_free_post_passage_prohibited", sqlalchemy.Boolean()),
-    sqlalchemy.Column("is_free_taxi_passage_prohibited", sqlalchemy.Boolean()),
-)
+metadata = MetaData()
+Base = declarative_base()
 
 
-barriers_table = sqlalchemy.Table(
-    "barriers",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("number", sqlalchemy.Integer()),
-    sqlalchemy.Column("description", sqlalchemy.String()),
-    sqlalchemy.Column("gsm_number_vp", sqlalchemy.String(50)),
-    sqlalchemy.Column("sip_number_vp", sqlalchemy.String(50)),
-    sqlalchemy.Column("camera_url", sqlalchemy.String(200)),
-    sqlalchemy.Column("camdirect_url", sqlalchemy.String(200)),
-)
+class Object(Base):
+    __tablename__ = 'objects'
+    metadata = metadata
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name_and_address = Column(String(), unique=True, nullable=False)
+    number = Column(Integer(), nullable=False)
+    description = Column(String())
+    is_free_departure_prohibited = Column(Boolean(), nullable=False)
+    is_free_jkh_passage_prohibited = Column(Boolean(), nullable=False)
+    is_free_delivery_passage_prohibited = Column(Boolean(), nullable=False)
+    is_free_collection_passage_prohibited = Column(Boolean(), nullable=False)
+    is_free_garbtrucks_passage_prohibited = Column(Boolean(), nullable=False)
+    is_free_post_passage_prohibited = Column(Boolean(), nullable=False)
+    is_free_taxi_passage_prohibited = Column(Boolean(), nullable=False)
+    barriers = relationship("Objects_Barriers", backref="object")
 
 
-objects_barriers_links_table = sqlalchemy.Table(
-    "objects_barriers_links",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("barrier_id", sqlalchemy.ForeignKey("barriers.id")),
-    sqlalchemy.Column("object_id", sqlalchemy.ForeignKey("objects.id")),
-)
+class Barrier(Base):
+    __tablename__ = 'barriers'
+    metadata = metadata
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    number = Column(Integer())
+    description = Column(String())
+    gsm_number_vp = Column(String(50))
+    sip_number_vp = Column(String(50))
+    camera_url = Column(String())
+    camdirect_url = Column(String())
+    objects = relationship("Objects_Barriers", backref="barrier")
+
+
+class Objects_Barriers(Base):
+    __tablename__ = 'objects_barriers'
+    metadata = metadata
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    barrier_id = Column(ForeignKey("barriers.id"))
+    object_id = Column(ForeignKey("objects.id"))
+
+
+class User(Base):
+    __tablename__ = 'users'
+    metadata = metadata
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    login = Column(String(), unique=True)
+    password_sha256 = Column(String(100))
+    role = Column(String(50))
