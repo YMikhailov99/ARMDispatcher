@@ -1,13 +1,13 @@
 from fastapi.templating import Jinja2Templates
 from fastapi_login import LoginManager
-from env import secret
-from fastapi.responses import HTMLResponse, RedirectResponse, ORJSONResponse
+from app.env import secret
+from fastapi.responses import HTMLResponse, RedirectResponse
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import FastAPI, HTTPException, Request, Depends, status, Form
+from fastapi import FastAPI, Request, Depends, status, Form
 from hashlib import sha256
 from fastapi_login.exceptions import InvalidCredentialsException
-from CRUD.queries import *
+from app.CRUD.queries import *
 
 templates = Jinja2Templates(directory="templates")
 SQLALCHEMY_DATABASE_URL = (

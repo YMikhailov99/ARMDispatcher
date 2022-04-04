@@ -1,4 +1,4 @@
-"""Added Users table
+ """Added Users table
 
 Revision ID: 5ff696e8d2c3
 Revises: 19383b6b20a9

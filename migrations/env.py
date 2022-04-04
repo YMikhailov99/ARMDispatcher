@@ -6,13 +6,13 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+from app.models import database, basicModels
 # add current path to PYTHONPATH, otherwise app module will not be found when alembic executing
 sys.path.append(os.getcwd())
 
-from models import database, basicModels
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+
 config = context.config
 
 section = config.config_ini_section
@@ -30,6 +30,7 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = [basicModels.metadata]
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

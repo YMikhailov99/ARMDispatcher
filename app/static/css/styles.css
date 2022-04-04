@@ -18,7 +18,7 @@ body {
 }
 .team-row button {
 	color: #fff;
-	background-color: #29c5e6;
+	background-color: #000;
 	border: none;
 	height: 32px;
 	min-width: 90px;
@@ -26,10 +26,6 @@ body {
 	margin-right: 10px;
 	margin-bottom: 5px;
 	padding: 2px;
-}
-
-p {
-	margin: 20px 0;
 }
 
 .team-row img {
@@ -43,6 +39,13 @@ p {
 
 }
 
-li {
-
+.team-row li {
+	list-style-type: none;
+	background: #1c7430;
    }
+
+p {
+	margin: 20px 0;
+	size: 50px;
+	color: #00dd1c;
+}

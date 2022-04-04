@@ -1,5 +1,5 @@
-from models.basicModels import *
-from models import database
+from app.models.basicModels import *
+from app.models import database
 from sqlalchemy import select, insert, delete, update
 
 # пока по id, потом по номеру
