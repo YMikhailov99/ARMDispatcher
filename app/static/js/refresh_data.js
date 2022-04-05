@@ -22,7 +22,7 @@ function show()
 							var div = document.createElement("div");
 							div.className = "team-row";
 							var vp = document.createElement("p");
-							vp.textContent ="ВП12: " + data[i].number;
+							vp.textContent ="ВП: " + data[i].number;
 							div.appendChild(vp);
 
 							var address = document.createElement("p");

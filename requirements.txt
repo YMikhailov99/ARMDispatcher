@@ -1,17 +1,14 @@
-#
-FROM python:3.9
-
-#
-WORKDIR /code
-
-#
-COPY ./requirements.txt /code/requirements.txt
-
-#
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-
-#
-COPY ./app /code/app
-
-#
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+aiofiles
+fastapi==0.75.0
+uvicorn==0.17.6
+fastapi-login==1.8.0
+sqlalchemy==1.4.32
+databases==0.5.5
+asyncpg==0.25.0
+Jinja2==3.0.3
+python-multipart==0.0.5
+starlette==0.17.1
+alembic~=1.7.6
+python-dotenv==0.20.0
+psycopg2==2.9.3
+FastAPI-SQLAlchemy==0.2.1

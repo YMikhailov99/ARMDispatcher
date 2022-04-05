@@ -8,11 +8,10 @@ from fastapi import FastAPI, Request, Depends, status, Form
 from hashlib import sha256
 from fastapi_login.exceptions import InvalidCredentialsException
 from app.CRUD.queries import *
+from fastapi.staticfiles import StaticFiles
 
-templates = Jinja2Templates(directory="templates")
-SQLALCHEMY_DATABASE_URL = (
-    f"postgresql://{database.DB_USER}:{database.DB_PASSWORD}@{database.DB_HOST}:5432/{database.DB_NAME}"
-)
+templates = Jinja2Templates(directory="app/templates")
+
 
 
 async def to_login(request, exc):
@@ -24,7 +23,9 @@ exceptions = {
     401: to_login,
 }
 
+
 app = FastAPI(exception_handlers=exceptions)
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 manager = LoginManager(secret, token_url='/auth/token', use_cookie=True, default_expiry=timedelta(hours=12))
 manager.cookie_name = 'ARMDispatcher'
 barriers = list()
