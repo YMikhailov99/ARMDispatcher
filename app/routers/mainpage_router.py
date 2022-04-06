@@ -1,17 +1,15 @@
 from fastapi.templating import Jinja2Templates
 from fastapi_login import LoginManager
-from app.env import secret
+from app.env import secret, APIKeyAster
 from fastapi.responses import HTMLResponse, RedirectResponse
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import FastAPI, Request, Depends, status, Form
-from hashlib import sha256
 from fastapi_login.exceptions import InvalidCredentialsException
 from app.CRUD.queries import *
 from fastapi.staticfiles import StaticFiles
 
 templates = Jinja2Templates(directory="app/templates")
-
 
 
 async def to_login(request, exc):
@@ -22,7 +20,6 @@ exceptions = {
     404: to_login,
     401: to_login,
 }
-
 
 app = FastAPI(exception_handlers=exceptions)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -45,11 +42,20 @@ async def load_user(username: str):
 @app.on_event("startup")
 async def startup():
     await database.database.connect()
+    await check_admin()
 
 
 @app.on_event("shutdown")
 async def shutdown():
     await database.database.disconnect()
+
+
+@app.post("/static_data_from_astrix/")
+async def get_static_data(data, APIKey: str):
+    if APIKey == APIKeyAster:
+        return data
+    else:
+        return HTMLResponse(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 @app.get("/dashboard", response_class=HTMLResponse, summary="Dashboard")
@@ -63,15 +69,15 @@ async def get_dashboard(request: Request, user=Depends(manager)):
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
 
-# пока по id, потом по номеру
 @app.post("/incoming_call/")
-async def add_barrier_to_list(barrier_id: int):
-    filtred = list(filter(lambda x: x["id"] == barrier_id, barriers))
+async def add_barrier_to_list(barrier_number: str):
+    filtred = list(filter(lambda x: parseNumber(x.gsm_number_vp) == parseNumber(barrier_number) or parseNumber(
+        x.sip_number_vp) == parseNumber(barrier_number), barriers))
     if len(filtred) > 0:
         while filtred[0] in barriers:
             barriers.remove(filtred[0])
     else:
-        barrier = await get_barrier(barrier_id)
+        barrier = await get_barrier(barrier_number)
         barriers.append(barrier)
     return barrier
 
@@ -123,9 +129,9 @@ async def login(data: OAuth2PasswordRequestForm = Depends()):
 async def token(data: OAuth2PasswordRequestForm = Depends()):
     username = data.username
     password = sha256(data.password.encode('utf-8')).hexdigest()
-    user = await load_user(username)  # we are using the same function to retrieve the user
+    user = await load_user(username)
     if not user:
-        raise InvalidCredentialsException  # you can also use your own HTTPException
+        raise InvalidCredentialsException
     elif password != user.password_sha256:
         raise InvalidCredentialsException
 

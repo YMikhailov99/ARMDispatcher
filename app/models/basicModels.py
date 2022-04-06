@@ -29,7 +29,6 @@ class Barrier(Base):
     metadata = metadata
     id = Column(Integer, primary_key=True, autoincrement=True)
     number = Column(Integer())
-    TestColumn = Column(Integer())
     description = Column(String())
     gsm_number_vp = Column(String(50))
     sip_number_vp = Column(String(50))
