@@ -1,9 +1,48 @@
-<nav >
-    <div class="justify-content-end">
-        <a href="/dashboard">Dashboard</a>&nbsp;
-        {% if content.user.role == "admin" %}
-            <a href="/users">Пользователи</a>&nbsp;
-        {% endif %}
-        <a href="/">Logout</a>&nbsp;
-    </div>
-</nav>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light " style="background-color: #e3f2fd;">
+         <div class="container-fluid">
+            <a class="nav-link" href="/dashboard">Dashboard</a>
+         </div>    &nbsp;
+            {% if content.user.role == "admin" %}
+            <div class="container-fluid">
+                <a class="nav-link" href="/users">Пользователи</a>&nbsp;
+            </div>
+            {% endif %}
+        <div class="container-fluid">
+            <a class="nav-link" href="/logs">Журнал</a>&nbsp;
+         </div>
+         <div class="container-fluid">
+            <a class="nav-link" href="/">Logout</a>&nbsp;
+         </div>
+        <div class="container-fluid">
+           <button class="btn-toggle">Темная тема</button>
+         </div>
+    </nav>
+    <script>
+        function applyTheme(theme) {
+            if(theme == ""){
+                document.body.classList.remove("dark-theme");
+            }
+            else {
+                document.body.classList.add("dark-theme");
+            }
+        }
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme") || "";
+
+            applyTheme(savedTheme);
+            document.querySelector('.btn-toggle').addEventListener('click', function() {
+                if(localStorage.getItem("theme") == "")
+                {
+                    localStorage.setItem("theme", "dark-theme");
+                }
+                else {
+                    localStorage.setItem("theme", "");
+                }
+                applyTheme(localStorage.getItem("theme"));
+            });
+        });
+    </script>
+</div>

@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine, MetaData, Table, Integer, String, \
-    Column, ForeignKey,  Boolean
+    Column, ForeignKey,  Boolean, DateTime, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from fastapi_sqlalchemy import DBSessionMiddleware
+
 metadata = MetaData()
 Base = declarative_base()
 
@@ -11,7 +11,7 @@ class Object(Base):
     __tablename__ = 'objects'
     metadata = metadata
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name_and_address = Column(String(), unique=True, nullable=False)
+    name_and_address = Column(String(), nullable=False)
     number = Column(Integer(), nullable=False)
     description = Column(String())
     is_free_departure_prohibited = Column(Boolean(), nullable=False)
@@ -27,7 +27,7 @@ class Object(Base):
 class Barrier(Base):
     __tablename__ = 'barriers'
     metadata = metadata
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String, primary_key=True)
     number = Column(Integer())
     description = Column(String())
     gsm_number_vp = Column(String(50))
@@ -52,3 +52,13 @@ class User(Base):
     login = Column(String(), unique=True)
     password_sha256 = Column(String(100))
     role = Column(String(50))
+
+
+class UsersActions(Base):
+    __tablename__ = 'users_actions'
+    metadata = metadata
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(ForeignKey("users.id"))
+    time = Column(DateTime, nullable=False)
+    action = Column(String())
+    image = Column(LargeBinary, nullable=True)
