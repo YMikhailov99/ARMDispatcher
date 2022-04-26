@@ -2,34 +2,72 @@ body {
 	color: #8f8f8f;
 	font: 12px Tahoma, sans-serif;
 	background-color: #f8f8f8;
-	border-top: 5px solid #7e7e7e;
-	margin: 0;
+	padding-top: 1px;
 }
-.emergency {
-	color: #f00;
+body.dark-theme {
+  color: #eeeeee;
+  background: #111111;
+}
+.table-stripped {
+	width: 90%;
+}
+body.dark-theme .table-stripped {
+	color: #eeeeee;
+	background: #343a40;
+}
+.add-user-list {
+	background: #e2e6ea;
+}
+body.dark-theme .add-user-list {
+	color: #eeeeee;
+	background: #343a40;
+}
+.team-row .emergency {
+	color: #fff;
 	background-color: #f00;
 	border: none;
-	height: 99px;
-	min-width: 90px;
 	font-family: 'Oswald', sans-serif;
-	margin-right: 10px;
-	margin-bottom: 5px;
-	padding: 2px;
+	margin-right: 2%;
+	margin-bottom: 1%;
+	padding: 1%;
 }
 .team-row button {
 	color: #fff;
 	background-color: #0d95e8;
 	border: none;
-	height: 32px;
-	min-width: 90px;
 	font-family: 'Oswald', sans-serif;
-	margin-right: 10px;
-	margin-bottom: 5px;
-	padding: 2px;
+	margin-right: 2%;
+	margin-bottom: 1%;
+	padding: 1%;
+}
+.team-row div {
+	color: #fff;
+	background-color: #0d95e8;
+	border: none;
+	margin: 30%;
+
+	padding: 1%;
+}
+
+
+h4, label {
+	color: #000000;
+
+}
+
+body.dark-theme h4, body.dark-theme label {
+	color: #eeeeee;
+
+}
+.btn-toggle{
+	background-color: #343a40;
+	color: #dae0e5;
+	border-radius: 5px;
 }
 
 .team-row img {
 	display: flex;
+	min-height: 250px;
 	height: 250px;
 	width: 250px;
 	border: 1px solid #fff;
@@ -37,6 +75,16 @@ body {
 	margin-right: 10px;
 	display: inline;
 
+}
+.BottomBtn {
+	color: #fff;
+	background-color: #e4606d;
+	border: none;
+	font-family: 'Oswald', sans-serif;
+	margin-right: 2%;
+	margin-top: 2%;
+	margin-bottom: 1%;
+	padding: 1%;
 }
 
 li {
@@ -46,4 +94,7 @@ li {
 p {
 	margin: 20px 0;
 	size: 50px;
+}
+.selector-for-some-widget {
+  box-sizing: content-box;
 }

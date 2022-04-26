@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+        <link rel="stylesheet" href="{{url_for('static', path = 'css/styles.css')}}" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; Charset=UTF-8">
+    </head>
+    <body>
+        {% include 'pages/header.html' %}
+        <center>
+            <table class="table table-stripped">
+            <tr><th>Пользователь</th><th>Время</th><th>Действие</th><th>camera_url</th></tr>
+                {% for action in content.actions %}
+                    <tr>
+                                <td valign="center" style="width: 20%">
+                                    <p>{{content.user.login}}</p>
+                                </td>
+                                <td valign="center" style="width: 10%">
+                                    <p>{{action.time}}</p>
+                                </td>
+                                <td valign="center" style="width: 20%">
+                                    <p>{{action.action}}</p>
+                                </td>
+                                <td valign="center" style="width: 20%">
+                                    <img src="data:image/jpg;base64, {{(action.image| string)[2:-1]}}" height="250px"></img>
+                                </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </center>
+    </body>
+</html>

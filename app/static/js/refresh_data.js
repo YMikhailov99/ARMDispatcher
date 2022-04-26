@@ -22,7 +22,7 @@ function show()
 							var div = document.createElement("div");
 							div.className = "team-row";
 							var vp = document.createElement("p");
-							vp.textContent ="ВП: " + data[i].number;
+							vp.textContent ="ВП: " + data[i].description;
 							div.appendChild(vp);
 
 							var address = document.createElement("p");
@@ -30,9 +30,15 @@ function show()
 							div.appendChild(address);
 
 							var reglament = document.createElement("p");
-							reglament.textContent ="Регламент: " + data[i].description;
+							reglament.textContent ="Регламент: " + data[i].description_1;
 							div.appendChild(reglament);
 
+							var RemoveCard_button = document.createElement("button");
+							RemoveCard_button.textContent = "Убрать карточку";
+							RemoveCard_button.className = "emergency";
+							div.appendChild(RemoveCard_button);
+							RemoveCard_button.value = ["Убрать", data[i].gsm_number_vp || data[i].sip_number_vp, data[i].id];
+							RemoveCard_button.onclick = asyncSendCloseRequestManually;
 
 							var Departure_button = document.createElement("button");
 							Departure_button.textContent = "Выезд";
@@ -70,22 +76,41 @@ function show()
 							if(!data[i].is_free_taxi_passage_prohibited){
 								div.appendChild(Taxi_button)
 							}
+
 							var img1 = document.createElement("img");
 							img1.src =data[i].camera_url;
+							var divim1 = document.createElement("div");
+							img1.src ="video_feed?src="+ encodeURIComponent(data[i].camera_url);
+							img1.loading = "lazy"
+							img1.className = "mh-100";
 							var img2 = document.createElement("img");
 							img2.src =data[i].camdirect_url;
+							img2.src ="video_feed?src="+ encodeURIComponent(data[i].camdirect_url);
+							img1.loading = "lazy"
 							div.appendChild(document.createElement("br"))
 							div.appendChild(img1)
 							div.appendChild(img2)
 
 							var buttons = div.querySelectorAll(".team-row button");
-								for (let j =0; j<buttons.length; j++)
+								for (let j =1; j<buttons.length; j++)
 								{
-									buttons[j].value = [buttons[j].textContent, data[i].id];
+									buttons[j].value = [buttons[j].textContent, data[i].gsm_number_vp || data[i].sip_number_vp, data[i].id];
 									buttons[j].onclick = sendOpenRequestToCore;
 								}
 							li.appendChild(div);
 							li.setAttribute("id", id);
+							li.className="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6"
+
+							/*var OpBtn = document.createElement("button");
+							OpBtn.textContent = "Подтвердить открытие";
+							OpBtn.className = "BottomBtn";
+							li.appendChild(OpBtn);
+
+							var HttpBtn = document.createElement("button");
+							HttpBtn.textContent = "HTTP";
+							HttpBtn.className = "BottomBtn";
+							li.appendChild(HttpBtn);*/
+
 							ul.appendChild(li);
 
 
@@ -109,7 +134,7 @@ function sendOpenRequestToCore() {
 				url: '/open_barrier_by_core',
 				method: 'get',
 				dataType: 'html',
-				data: {button_name: parameters[0], barrier_id: parameters[1]},
+				data: {button_name: parameters[0], barrier_number: parameters[1]},
 				success: function(response){
 					response = JSON.parse(response)
 					if(response){
@@ -121,7 +146,7 @@ function sendOpenRequestToCore() {
 						var ul_children = ul.children;
 						for(var i = 0; i<ul_children.length; i++) {
 							var ul_child_id = ul_children[i].getAttribute('id').slice(7);
-							if(parameters[1] == ul_child_id){
+							if(parameters[2] == ul_child_id){
 								var Open_mannually_button = document.createElement("button");
 								Open_mannually_button.textContent = "Открыть напрямую";
 								Open_mannually_button.value = parameters;
@@ -134,7 +159,11 @@ function sendOpenRequestToCore() {
 					}
 			});
         }
-
+async function asyncSendCloseRequestManually(){
+	var parameters = event.srcElement.value.replace('[', '').replace(']', '').split(',');
+	var Open_button = event.srcElement;
+	await sendCloseRequestManually(parameters, Open_button)
+}
 function sendOpenRequestManually() {
 	var parameters = event.srcElement.value.replace('[', '').replace(']', '').split(',');
 	var Open_button = event.srcElement;
@@ -142,7 +171,7 @@ function sendOpenRequestManually() {
 				url: '/open_manually',
 				method: 'get',
 				dataType: 'html',
-				data: {button_name: parameters[0], barrier_id: parameters[1]},
+				data: {button_name: parameters[0], barrier_number: parameters[1]},
 				success: function(response){
 					response = JSON.parse(response)
 					if(response){
@@ -150,7 +179,7 @@ function sendOpenRequestManually() {
 						var ul_children = ul.children;
 						for(var i = 0; i<ul_children.length; i++) {
 							var ul_child_id = ul_children[i].getAttribute('id').slice(7);
-							if(parameters[1] == ul_child_id){
+							if(parameters[2] == ul_child_id){
 								var Close_mannually_button = document.createElement("button");
 								Close_mannually_button.textContent = "Закрыть";
 								Close_mannually_button.style["background-color"] = "#f00";
@@ -169,14 +198,13 @@ function sendOpenRequestManually() {
 			});
         }
 
-function sendCloseRequestManually() {
-	var parameters = event.srcElement.value.replace('[', '').replace(']', '').split(',');
-	var Close_button = event.srcElement;
-			$.ajax({
+async function sendCloseRequestManually(parameters, Close_button) {
+			await $.ajax({
 				url: '/close_manually',
 				method: 'get',
+				async: true,
 				dataType: 'html',
-				data: {button_name: parameters[0], barrier_id: parameters[1]},
+				data: {button_name: parameters[0], barrier_number: parameters[1]},
 				success: function(response){
 					response = JSON.parse(response)
 					if(response){
@@ -184,7 +212,7 @@ function sendCloseRequestManually() {
 						var ul_children = ul.children;
 						for(var i = 0; i<ul_children.length; i++) {
 							var ul_child_id = ul_children[i].getAttribute('id').slice(7);
-							if(parameters[1] == ul_child_id){
+							if(parameters[2] == ul_child_id){
 								ul_children[i].removeChild(Close_button);
 							}
 						}

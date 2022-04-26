@@ -1,19 +1,28 @@
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+        <meta http-equiv="Content-Type" content="text/html; Charset=UTF-8">
+    </head>
 <body>
-<center>
+<div class="container-fluid d-flex h-100 justify-content-center align-items-center p-0">
+		<div class="container d-flex justify-content-center ">
+
+			<div class="card shadow">
+
+				<div class="card-body">
 					<form method="POST" action="/auth/login">
 						<div class='row'>
 
-						<div class='col-1' style="align-self: end;"><label for="username">Логин</label></div>
-						<div class='col'><input class="form-control m-1" id="username" name="username" type="text"></div>
+							<div class='col-3' style="align-self: end;"><label for="username" style="width: auto">Логин</label></div>
+							<div class='col'><input class="form-control m-1" id="username" name="username" type="text"></div>
 						</div>
 						<div class='row'>
-						<div class='col-1' style="align-self: end;"><label for="password">Пароль</label></div>
-						<div class='col'><input class="form-control m-1" id="password" name="password" type="password"></div>
+							<div class='col-3' style="align-self: end;"><label for="password">Пароль</label></div>
+							<div class='col'><input class="form-control m-1" id="password" name="password" type="password"></div>
 						</div>
 						<br>
 						<center>
@@ -22,7 +31,9 @@
 							</button>
 						</center>
 					</form>
-	</center>
-
+				</div>
+			</div>
+		</div>
+</div>
 </body>
 </html>

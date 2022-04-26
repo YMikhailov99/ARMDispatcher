@@ -1,21 +1,24 @@
+<!doctype html>
 <html lang="ru">
-<head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
         <link rel="stylesheet" href="{{url_for('static', path = 'css/styles.css')}}" type="text/css">
         <meta http-equiv="Content-Type" content="text/html; Charset=UTF-8">
     </head>
-<body>
-    {% include 'pages/header.html' %}
-    <div>
-            <center>
-            <table class="table table-stripped table-hover table-sm">
+    <body>
+        {% include 'pages/header.html' %}
+        <center>
+            <table class="table table-stripped">
             <tr><th>Логин</th><th>Роль</th><th>Пароль</th></tr>
                 {% for user in content.users %}
                     <tr>
                         <form method="POST" action="/edit_user">
                                 <input hidden="hidden" id="user_id" name="user_id" value={{ user.id }}>
-                                <td><input id="user_login" name="user_login" value={{ user.login }}></td>
-                                <td>
-                                    <select name="user_role" id="user_role" >
+                                <td valign="center" style="width: 20%"><input id="user_login" name="user_login" style="width: 80%;" value={{ user.login }}></td>
+                                <td valign="center" style="width: 10%">
+                                    <select name="user_role" id="user_role" style="width: 80%;">
                                         {% if user.role == "admin" %}
                                             <option selected value="admin">Администратор</option>
                                             <option value="dispatcher">Диспетчер</option>
@@ -25,32 +28,35 @@
                                         {% endif %}
                                         </select>
                                 </td>
-                                <td><input id="user_password" name="user_password"></td>
+                                <td valign="center" style="width: 20%"><input id="user_password" name="user_password" style="width: 80%;"></td>
 
-                                <td><button type="submit">Редактировать</button></td>
+                                <td style="width: 10%"><button class="btn btn-outline-primary" type="submit">Редактировать</button></td>
                         </form>
-                        <td>
+                        <td style="width: 10%">
                             <form method="POST" action="/remove_user" style="margin: 0px; padding: 0px">
                                 <input hidden="hidden" id="user_login" name="user_login" value={{ user.login }}>
-                                <button type="submit">Удалить</button>
+                                <button class="btn btn-danger" type="submit">Удалить</button>
                             </form>
                         </td>
                     </tr>
                 {% endfor %}
             </table>
-            <form method="POST" action="/add_user">
-                                    <div class='row'>
+            <div class="container add-user-list">
+                <div class="row">
+                    <h4>Добавить нового пользователя</h4>
+                <form method="POST" action="/add_user">
+                                    <div>
                                         <div><label for="username">Логин</label></div>
                                         <div><input id="username" name="username" type="text" autocomplete="off"></div>
                                     </div>
-                                    <div class='row'>
+                                    <div>
                                         <div style="align-self: end;"><label for="role">Роль</label></div>
-                                        <select name="role" id="role">
+                                        <select name="role" id="role" style="width: max-content; align-self: end">
                                             <option value="admin">Администратор</option>
                                             <option value="dispatcher">Диспетчер</option>
                                         </select>
                                     </div>
-                                     <div class='row'>
+                                     <div>
                                         <div style="align-self: end;"><label for="password">Пароль</label></div>
                                         <div ><input id="password" name="password" type="password" autocomplete="off"></div>
                                     </div>
@@ -60,9 +66,11 @@
                                             &nbsp;Добавить пользователя
                                         </button>
                                     </center>
-                                </form>
-        </center>
-    </div>
+                </form>
+            </div>
 
-</body>
+            </div>
+
+        </center>
+    </body>
 </html>
