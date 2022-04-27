@@ -40,6 +40,30 @@ function show()
 							RemoveCard_button.value = ["Убрать", data[i].gsm_number_vp || data[i].sip_number_vp, data[i].id];
 							RemoveCard_button.onclick = asyncSendCloseRequestManually;
 
+							var Ambulance_button = document.createElement("button");
+							Ambulance_button.textContent = "Скорая";
+							div.appendChild(Ambulance_button);
+							Ambulance_button.value = ["Скорая", data[i].gsm_number_vp || data[i].sip_number_vp, data[i].id];
+							Ambulance_button.onclick = asyncSendOpenRequestToCore;
+
+							var MChS_button = document.createElement("button");
+							MChS_button.textContent = "МЧС";
+							div.appendChild(MChS_button);
+							MChS_button.value = ["МЧС", data[i].gsm_number_vp || data[i].sip_number_vp, data[i].id];
+							MChS_button.onclick = asyncSendOpenRequestToCore;
+
+							var Police_button = document.createElement("button");
+							Police_button.textContent = "Полиция";
+							div.appendChild(Police_button);
+							Police_button.value = ["Полиция", data[i].gsm_number_vp || data[i].sip_number_vp, data[i].id];
+							Police_button.onclick = asyncSendOpenRequestToCore;
+
+							var Avaryjnaya_button = document.createElement("button");
+							Avaryjnaya_button.textContent = "Аварийная служба";
+							div.appendChild(Avaryjnaya_button);
+							Avaryjnaya_button.value = ["Аварийная служба", data[i].gsm_number_vp || data[i].sip_number_vp, data[i].id];
+							Avaryjnaya_button.onclick = asyncSendOpenRequestToCore;
+
 							var Departure_button = document.createElement("button");
 							Departure_button.textContent = "Выезд";
 							var JKH_button = document.createElement("button");
@@ -95,7 +119,7 @@ function show()
 								for (let j =1; j<buttons.length; j++)
 								{
 									buttons[j].value = [buttons[j].textContent, data[i].gsm_number_vp || data[i].sip_number_vp, data[i].id];
-									buttons[j].onclick = sendOpenRequestToCore;
+									buttons[j].onclick = asyncSendOpenRequestToCore;
 								}
 							li.appendChild(div);
 							li.setAttribute("id", id);
@@ -126,11 +150,15 @@ function show()
 			show();
 			setInterval('show()',1000);
 		});
-
-function sendOpenRequestToCore() {
+async function asyncSendOpenRequestToCore(){
 	var parameters = event.srcElement.value.replace('[', '').replace(']', '').split(',');
-
-			$.ajax({
+	var Open_button = event.srcElement;
+	await sendOpenRequestToCore(parameters, Open_button);
+}
+async function sendOpenRequestToCore(parameters, Open_button) {
+	Open_button.disabled = true;
+	Open_button.classList.add('pressed-button');
+			 await $.ajax({
 				url: '/open_barrier_by_core',
 				method: 'get',
 				dataType: 'html',
@@ -156,14 +184,12 @@ function sendOpenRequestToCore() {
 							}
 						}
 					}
-					}
+					Open_button.classList.remove('pressed-button');
+					Open_button.disabled = false;
+				}
 			});
         }
-async function asyncSendCloseRequestManually(){
-	var parameters = event.srcElement.value.replace('[', '').replace(']', '').split(',');
-	var Open_button = event.srcElement;
-	await sendCloseRequestManually(parameters, Open_button)
-}
+
 function sendOpenRequestManually() {
 	var parameters = event.srcElement.value.replace('[', '').replace(']', '').split(',');
 	var Open_button = event.srcElement;
@@ -197,8 +223,14 @@ function sendOpenRequestManually() {
 					}
 			});
         }
-
+async function asyncSendCloseRequestManually(){
+	var parameters = event.srcElement.value.replace('[', '').replace(']', '').split(',');
+	var Close_button = event.srcElement;
+	await sendCloseRequestManually(parameters, Close_button);
+}
 async function sendCloseRequestManually(parameters, Close_button) {
+	Close_button.disabled = true;
+	Close_button.classList.add('pressed-button');
 			await $.ajax({
 				url: '/close_manually',
 				method: 'get',
@@ -220,6 +252,8 @@ async function sendCloseRequestManually(parameters, Close_button) {
 					else {
 						window.alert("Шлагбаум с id = " + parameters[1] + " закрыть не удалось");
 					}
-					}
+					Close_button.classList.remove('pressed-button');
+					Close_button.disabled = false;
+				}
 			});
-        }
+}
