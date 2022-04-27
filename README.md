@@ -13,3 +13,8 @@
 ## Запуск
 
     docker-compose up
+## API звонка
+POST-запрос на 
+
+    {host}/incoming_call?barrier_number=barrier_uid
+Отправлять при поступлении звонка и при завершении.
