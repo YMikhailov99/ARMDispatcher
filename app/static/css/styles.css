@@ -65,6 +65,11 @@ body.dark-theme h4, body.dark-theme label {
 	border-radius: 5px;
 }
 
+.team-row .pressed-button{
+	background-color: #e4606d;
+	color: #dae0e5;
+}
+
 .team-row img {
 	display: flex;
 	min-height: 250px;
